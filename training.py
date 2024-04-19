@@ -52,7 +52,7 @@ for epoch in range(epochs):
     for i, sample in enumerate(pbar):
         image = sample['image'].to(device)
         features = pdn(image)
-        t = diffusion.sample_timesteps(features.shape[0])
+        t = diffusion.sample_timesteps(features.shape[0]).to(device)
         x_t, noise = diffusion.noise_input(features, t)
         predicted_noise = model(x_t, t)
         loss = F.mse_loss(predicted_noise, noise)
