@@ -177,6 +177,7 @@ class UNet(nn.Module):
         print(x4.shape, t.shape, x3.shape)
 
         x = self.up1(x4, x3, t)
+        print(x.shape)
         x = self.sa4(x)
         x = self.up2(x, x2, t)
         x = self.sa5(x)
