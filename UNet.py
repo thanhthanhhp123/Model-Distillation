@@ -105,6 +105,7 @@ class Up(nn.Module):
         super().__init__()
 
         self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+        self.up_ = nn.Upsample(scale_factor=1.75, mode="bilinear", align_corners=True)
         self.conv = nn.Sequential(
             DoubleConv(in_channels, in_channels, residual=True),
             DoubleConv(in_channels, out_channels, in_channels // 2),
@@ -119,8 +120,10 @@ class Up(nn.Module):
         )
 
     def forward(self, x, skip_x, t):
-        x = self.up(x)
-        print(x.shape)
+        if x.shape[-1] == 4:
+            x = self.up_(x)
+        else:
+            x = self.up(x)
         x = torch.cat([skip_x, x], dim=1)
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
