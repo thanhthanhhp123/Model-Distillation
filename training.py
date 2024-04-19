@@ -48,8 +48,8 @@ logging.basicConfig(filename='logs/disnet.log', level=logging.DEBUG)
 
 for epoch in range(epochs):
     logging.info("Epoch: %d", epoch)
-    # pbar = tqdm.tqdm(train_loader)
-    for i, sample in enumerate(train_loader):
+    pbar = tqdm.tqdm(train_loader)
+    for i, sample in enumerate(pbar):
         image = sample['image'].to(device)
         features = pdn(image)
         t = diffusion.sample_timesteps(features.shape[0]).to(device)
@@ -61,7 +61,7 @@ for epoch in range(epochs):
         loss.backward()
         optimizer.step()
 
-        print(f'Epoch: {epoch}, Loss: {loss.item()}')
+        pbar.set_description(f"Loss: {loss.item()}")
         logger.add_scalar('Loss', loss.item(), epoch * len(train_loader) + i)
     torch.save(model.state_dict(), f'{output_folder}/disnet.pth')
 

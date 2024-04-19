@@ -78,6 +78,11 @@ class Down(nn.Module):
             DoubleConv(in_channels, in_channels, residual=True),
             DoubleConv(in_channels, out_channels),
         )
+        self.maxpool_conv_ = nn.Sequential(
+            nn.MaxPool2d(2, padding = 1),
+            DoubleConv(in_channels, in_channels, residual=True),
+            DoubleConv(in_channels, out_channels),
+        )
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
@@ -88,7 +93,10 @@ class Down(nn.Module):
         )
 
     def forward(self, x, t):
-        x = self.maxpool_conv(x)
+        if x.shape[-1] % 2 == 0:
+            x = self.maxpool_conv(x)
+        else:
+            x = self.maxpool_conv_(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         return x + emb
     
