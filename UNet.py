@@ -167,30 +167,21 @@ class UNet(nn.Module):
     def forward(self, x, t):
         t = t.unsqueeze(-1).type(torch.float)
         t = self.pos_encoding(t, self.time_dim)
-        print(t.shape)
-
         x1 = self.inc(x)
-        print(x1.shape)
         x2 = self.down1(x1, t)
-        print(x2.shape)
         x2 = self.sa1(x2)
         x3 = self.down2(x2, t)
-        print(x3.shape)
         x3 = self.sa2(x3)
         x4 = self.down3(x3, t)
-        print(x4.shape)
         x4 = self.sa3(x4)
 
         x4 = self.bot1(x4)
         x4 = self.bot2(x4)
         x4 = self.bot3(x4)
 
-        print(x4.shape, t.shape, x3.shape)
 
         x = self.up1(x4, x3, t)
-        print(x.shape)
         x = self.sa4(x)
-        print('sa4: ', x.shape)
         x = self.up2(x, x2, t)
         x = self.sa5(x)
         x = self.up3(x, x1, t)
