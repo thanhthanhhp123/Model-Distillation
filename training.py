@@ -47,6 +47,7 @@ logger = SummaryWriter(log_dir='logs', flush_secs=10, filename_suffix='disnet')
 logging.basicConfig(filename='logs/disnet.log', level=logging.DEBUG)
 
 for epoch in range(epochs):
+    losses = []
     logging.info("Epoch: %d", epoch)
     pbar = tqdm.tqdm(train_loader)
     for i, sample in enumerate(pbar):
@@ -61,9 +62,17 @@ for epoch in range(epochs):
         loss.backward()
         optimizer.step()
 
+        losses.append(loss.item())
+
         pbar.set_description(f"Loss: {loss.item()}")
         logger.add_scalar('Loss', loss.item(), epoch * len(train_loader) + i)
-    torch.save(model.state_dict(), f'{output_folder}/disnet.pth')
+    torch.save({
+        'model': model.state_dict(),
+        'optimizer': optimizer.state_dict(),
+        'epoch': epoch,
+        'losses': losses
+
+    }, f'{output_folder}/disnet.pth')
 
 
 
